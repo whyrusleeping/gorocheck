@@ -22,6 +22,7 @@ type Goroutine struct {
 	Function string
 	Number   int
 	Action   string
+	Stack    []string
 }
 
 func funcNameFromStackLine(s string) string {
@@ -37,6 +38,7 @@ func parseStack() []*Goroutine {
 	stkbuf = stkbuf[:n]
 
 	var out []*Goroutine
+	var cur *Goroutine
 	scan := bufio.NewScanner(bytes.NewReader(stkbuf))
 	for scan.Scan() {
 		if strings.HasPrefix(scan.Text(), "goroutine") {
@@ -51,10 +53,15 @@ func parseStack() []*Goroutine {
 
 			fname := funcNameFromStackLine(scan.Text())
 
-			out = append(out, &Goroutine{
+			g := &Goroutine{
 				Number:   num,
 				Function: fname,
-			})
+				Stack:    []string{scan.Text()},
+			}
+			out = append(out, g)
+			cur = g
+		} else if cur != nil {
+			cur.Stack = append(cur.Stack, scan.Text())
 		}
 	}
 	return out
@@ -64,6 +71,7 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 	sys := map[string]struct{}{
 		"testing.RunTests":      struct{}{},
 		pkgName + ".parseStack": struct{}{},
+		"signal.loop":           struct{}{},
 	}
 
 	var out []*Goroutine
@@ -78,7 +86,7 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 func CheckForLeaks() error {
 	goros := filterSystemRoutines(parseStack())
 	if len(goros) > 0 {
-		return fmt.Errorf("had %d goroutines still running. First on list: %s", len(goros), goros[0].Function)
+		return fmt.Errorf("had %d goroutines still running. First on list: %s", len(goros), goros[0].Stack)
 	}
 	return nil
 }
