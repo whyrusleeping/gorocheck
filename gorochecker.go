@@ -83,8 +83,16 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 	return out
 }
 
-func CheckForLeaks() error {
+func CheckForLeaks(filter func(*Goroutine) bool) error {
 	goros := filterSystemRoutines(parseStack())
+	var gorosFiltered []*Goroutine
+	if filter != nil {
+		for _, g := range goros {
+			if !filter(g) {
+				gorosFiltered = append(gorosFiltered, g)
+			}
+		}
+	}
 	if len(goros) > 0 {
 		return fmt.Errorf("had %d goroutines still running. First on list: %s", len(goros), goros[0].Stack)
 	}

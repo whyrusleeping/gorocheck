@@ -6,7 +6,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	err := CheckForLeaks()
+	err := CheckForLeaks(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -17,7 +17,7 @@ func TestParse(t *testing.T) {
 		}
 	}()
 
-	err = CheckForLeaks()
+	err = CheckForLeaks(nil)
 	if err == nil {
 		t.Fatal("Expected check to fail.")
 	}
