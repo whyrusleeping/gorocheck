@@ -19,7 +19,8 @@ func TestManyThings(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = gorocheck.CheckForLeaks()
+	// pass nil for no goroutine filter
+	err = gorocheck.CheckForLeaks(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
