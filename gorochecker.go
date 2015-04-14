@@ -4,9 +4,19 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"reflect"
 	"runtime"
 	"strings"
 )
+
+var pkgName string
+
+func init() {
+	t := reflect.TypeOf(Goroutine{})
+	parts := strings.Split(t.PkgPath(), "/")
+
+	pkgName = parts[len(parts)-1]
+}
 
 type Goroutine struct {
 	Function string
@@ -52,8 +62,8 @@ func parseStack() []*Goroutine {
 
 func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 	sys := map[string]struct{}{
-		"testing.RunTests":        struct{}{},
-		"goro-checker.parseStack": struct{}{},
+		"testing.RunTests":      struct{}{},
+		pkgName + ".parseStack": struct{}{},
 	}
 
 	var out []*Goroutine
