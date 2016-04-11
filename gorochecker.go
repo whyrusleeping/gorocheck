@@ -72,6 +72,7 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 		"testing.RunTests":      struct{}{},
 		pkgName + ".parseStack": struct{}{},
 		"signal.loop":           struct{}{},
+		"runtime.goexit":        struct{}{},
 	}
 
 	var out []*Goroutine
@@ -93,6 +94,7 @@ func CheckForLeaks(filter func(*Goroutine) bool) error {
 			}
 		}
 	}
+	goros = gorosFiltered
 	if len(goros) > 0 {
 		return fmt.Errorf("had %d goroutines still running. First on list: %s", len(goros), goros[0].Stack)
 	}
