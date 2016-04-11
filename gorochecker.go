@@ -72,6 +72,7 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 		"testing.RunTests":      struct{}{},
 		pkgName + ".parseStack": struct{}{},
 		"signal.loop":           struct{}{},
+		"signal.signal_recv":    struct{}{},
 		"runtime.goexit":        struct{}{},
 	}
 
@@ -79,6 +80,8 @@ func filterSystemRoutines(gs []*Goroutine) []*Goroutine {
 	for _, g := range gs {
 		if _, found := sys[g.Function]; !found {
 			out = append(out, g)
+		} else {
+			fmt.Println("skipped ", g)
 		}
 	}
 	return out
