@@ -97,7 +97,7 @@ func CheckForLeaks(filter func(*Goroutine) bool) error {
 	}
 	goros = gorosFiltered
 	if len(goros) > 0 {
-		return fmt.Errorf("had %d goroutines still running. First on list: %s", len(goros), goros[0].Stack)
+		return fmt.Errorf("had %d goroutines still running. First on list:\n%s", len(goros), strings.Join(goros[0].Stack, "\n"))
 	}
 	return nil
 }
